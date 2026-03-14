@@ -2,7 +2,6 @@ package com.prevelio.customer.infrastructure.rest;
 
 import java.util.UUID;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.prevelio.common.dto.PagedResponse;
 import com.prevelio.customer.application.dto.CustomerRequestDto;
@@ -48,11 +47,11 @@ public class CustomerResource {
     @GET
     public PagedResponse<CustomerResponseDto> searchCustomers(@BeanParam CustomerSearchCriteria criteria) {
         PagedResponse<Customer> pagedCustomers = customerService.searchCustomers(criteria);
-        
+
         List<CustomerResponseDto> dtoList = pagedCustomers.getData().stream()
                 .map(CustomerMapper::toCustomerResponseDto)
-                .collect(Collectors.toList());
-                
+                .toList();
+
         return new PagedResponse<>(dtoList, pagedCustomers.getMetadata());
     }
 
