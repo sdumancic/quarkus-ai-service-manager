@@ -1,7 +1,6 @@
 package com.prevelio.service.application.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.prevelio.service.application.dto.ServiceItemRequestDto;
 import com.prevelio.service.application.dto.ServiceItemResponseDto;
@@ -26,7 +25,7 @@ public class ServiceItemAppService {
     public List<ServiceItemResponseDto> getAllServices() {
         return repository.findAll().stream()
                 .map(ServiceItemMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public ServiceItemResponseDto getServiceById(Long id) {
@@ -48,6 +47,7 @@ public class ServiceItemAppService {
         existing.setCode(request.getCode());
         existing.setDescription(request.getDescription());
         existing.setPrice(request.getPrice());
+        existing.setDurationInMinutes(request.getDurationInMinutes());
         
         ServiceItem updated = repository.update(existing);
         return ServiceItemMapper.toDto(updated);

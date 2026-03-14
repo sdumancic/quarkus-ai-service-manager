@@ -16,4 +16,5 @@ public class ServiceItem {
     private String code; // e.g., TIRE_CHANGE_16
     private String description;
     private BigDecimal price;
+    private Integer durationInMinutes;
 }

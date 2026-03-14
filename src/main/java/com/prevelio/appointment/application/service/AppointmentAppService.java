@@ -1,5 +1,6 @@
 package com.prevelio.appointment.application.service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import com.prevelio.appointment.application.dto.AppointmentResponseDto;
 import com.prevelio.appointment.application.mapper.AppointmentMapper;
 import com.prevelio.appointment.domain.model.Appointment;
 import com.prevelio.appointment.domain.repository.AppointmentRepository;
+import com.prevelio.service.domain.repository.ServiceRepository;
 
 import com.prevelio.common.lock.DistributedLock;
 import com.prevelio.customer.application.mapper.CustomerMapper;
@@ -24,11 +26,14 @@ public class AppointmentAppService {
     private static final String APPOINTMENT_NOT_FOUND = "Appointment not found";
     private final AppointmentRepository repository;
     private final CustomerService customerService;
+    private final ServiceRepository serviceRepository;
 
     @Inject
-    public AppointmentAppService(AppointmentRepository repository, CustomerService customerService) {
+    public AppointmentAppService(AppointmentRepository repository, CustomerService customerService,
+            ServiceRepository serviceRepository) {
         this.repository = repository;
         this.customerService = customerService;
+        this.serviceRepository = serviceRepository;
     }
 
     public List<AppointmentResponseDto> getAllAppointments() {
@@ -151,6 +156,30 @@ public class AppointmentAppService {
             throw new BadRequestException("End date must be after start date");
         }
 
+        // Check 30-minute slots
+        if (!isRoundedToHalfHour(request.getStartDate())) {
+            throw new BadRequestException("Start date must be rounded to half hour (e.g. 10:00, 10:30)");
+        }
+        if (!isRoundedToHalfHour(request.getEndDate())) {
+            throw new BadRequestException("End date must be rounded to half hour (e.g. 10:00, 10:30)");
+        }
+
+        // Check duration matches sum of services
+        long expectedDurationMinutes = 0;
+        if (request.getServiceIds() != null) {
+            for (Long serviceId : request.getServiceIds()) {
+                expectedDurationMinutes += serviceRepository.findById(serviceId)
+                        .orElseThrow(() -> new BadRequestException("Service item not found: " + serviceId))
+                        .getDurationInMinutes();
+            }
+        }
+
+        long actualDurationMinutes = Duration.between(request.getStartDate(), request.getEndDate()).toMinutes();
+        if (actualDurationMinutes != expectedDurationMinutes) {
+            throw new BadRequestException("Appointment duration (" + actualDurationMinutes 
+                + " min) does not match required service duration (" + expectedDurationMinutes + " min)");
+        }
+
         LocalDateTime minAllowedDate = LocalDateTime.now().plusDays(3);
         if (request.getEndDate().isBefore(minAllowedDate)) {
             throw new BadRequestException("Appointments cannot be scheduled or end within the next 3 days");
@@ -158,5 +187,11 @@ public class AppointmentAppService {
         if (request.getStartDate().isBefore(minAllowedDate)) {
             throw new BadRequestException("Appointments cannot be scheduled or start within the next 3 days");
         }
+    }
+
+    private boolean isRoundedToHalfHour(LocalDateTime dateTime) {
+        return (dateTime.getMinute() == 0 || dateTime.getMinute() == 30) 
+            && dateTime.getSecond() == 0 
+            && dateTime.getNano() == 0;
     }
 }

@@ -12,4 +12,5 @@ public class ServiceItemResponseDto {
     private String code;
     private String description;
     private BigDecimal price;
+    private Integer durationInMinutes;
 }

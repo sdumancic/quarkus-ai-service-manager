@@ -1,6 +1,7 @@
 package com.prevelio.appointment.infrastructure.config;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -68,14 +69,15 @@ public class AppointmentStartup {
         Long vehicleId = customer.getVehicles().isEmpty() ? null : customer.getVehicles().get(0).getId();
 
         for (int i = 1; i <= 5; i++) {
+            LocalDateTime startDate = LocalDateTime.now().minusDays(30L + i).withMinute(0).withSecond(0).withNano(0);
             Appointment pastAppointment = new Appointment();
             pastAppointment.setCustomerId(customer.getId());
             pastAppointment.setCustomerUuid(customer.getCustomerUuid());
             pastAppointment.setVehicleId(vehicleId);
             pastAppointment.setVehicleUuid(vehicleUuid);
-            pastAppointment.setStartDate(LocalDateTime.now().minusDays(30L + i));
-            pastAppointment.setEndDate(LocalDateTime.now().minusDays(30L + i).plusHours(2));
-            pastAppointment.setServiceIds(Collections.singletonList(2L)); // sample service ID
+            pastAppointment.setStartDate(startDate);
+            pastAppointment.setEndDate(startDate.plusMinutes(30));
+            pastAppointment.setServiceIds(Collections.singletonList(2L)); // sample service ID (30 min)
             pastAppointment.setStatus(AppointmentStatus.COMPLETED);
             appointmentRepository.save(pastAppointment);
         }
@@ -85,12 +87,18 @@ public class AppointmentStartup {
         UUID vehicleUuid = getPrimaryOrSecondaryVehicleUuid(customer);
 
         for (int i = 1; i <= 2; i++) {
+            LocalDateTime startDate = LocalDateTime.now().plusDays(5L + i).withMinute(30).withSecond(0).withNano(0);
             AppointmentRequestDto request = new AppointmentRequestDto();
             request.setCustomerUuid(customer.getCustomerUuid());
             request.setVehicleUuid(vehicleUuid);
-            request.setStartDate(LocalDateTime.now().plusDays(5L + i));
-            request.setEndDate(LocalDateTime.now().plusDays(5L + i).plusHours(2));
-            request.setServiceIds(Collections.singletonList(1L)); // sample service ID
+            request.setStartDate(startDate);
+
+            List<Long> services = new ArrayList<>();
+            services.add(1L); // Tire Change (30m)
+            services.add(11L); // Balancing (30m)
+
+            request.setEndDate(startDate.plusMinutes(60)); // Sum = 60m
+            request.setServiceIds(services);
             appointmentAppService.createAppointment(request);
         }
     }

@@ -22,22 +22,28 @@ public class InMemoryServiceRepository implements ServiceRepository {
 
     @PostConstruct
     void init() {
-        createPredefined("TIRE_CHANGE_16", "Tire Change 16\"", new BigDecimal("40.00"));
-        createPredefined("TIRE_CHANGE_17", "Tire Change 17\"", new BigDecimal("50.00"));
-        createPredefined("TIRE_CHANGE_18", "Tire Change 18\"", new BigDecimal("60.00"));
-        createPredefined("TIRE_CHANGE_19", "Tire Change 19\"", new BigDecimal("70.00"));
-        createPredefined("TIRE_CHANGE_20", "Tire Change 20\"", new BigDecimal("80.00"));
+        createPredefined("TIRE_CHANGE_16", "Tire Change 16\"", new BigDecimal("40.00"), 30);
+        createPredefined("TIRE_CHANGE_17", "Tire Change 17\"", new BigDecimal("50.00"), 30);
+        createPredefined("TIRE_CHANGE_18", "Tire Change 18\"", new BigDecimal("60.00"), 30);
+        createPredefined("TIRE_CHANGE_19", "Tire Change 19\"", new BigDecimal("70.00"), 30);
+        createPredefined("TIRE_CHANGE_20", "Tire Change 20\"", new BigDecimal("80.00"), 30);
         
-        createPredefined("TIRE_STORAGE_16", "Tire Storage 16\"", new BigDecimal("30.00"));
-        createPredefined("TIRE_STORAGE_17", "Tire Storage 17\"", new BigDecimal("35.00"));
-        createPredefined("TIRE_STORAGE_18", "Tire Storage 18\"", new BigDecimal("40.00"));
-        createPredefined("TIRE_STORAGE_19", "Tire Storage 19\"", new BigDecimal("45.00"));
-        createPredefined("TIRE_STORAGE_20", "Tire Storage 20\"", new BigDecimal("50.00"));
+        createPredefined("TIRE_STORAGE_16", "Tire Storage 16\"", new BigDecimal("30.00"), 0);
+        createPredefined("TIRE_STORAGE_17", "Tire Storage 17\"", new BigDecimal("35.00"), 0);
+        createPredefined("TIRE_STORAGE_18", "Tire Storage 18\"", new BigDecimal("40.00"), 0);
+        createPredefined("TIRE_STORAGE_19", "Tire Storage 19\"", new BigDecimal("45.00"), 0);
+        createPredefined("TIRE_STORAGE_20", "Tire Storage 20\"", new BigDecimal("50.00"), 0);
+
+        createPredefined("BALANCING_16", "Balancing Tires 16\"", new BigDecimal("20.00"), 30);
+        createPredefined("BALANCING_17", "Balancing Tires 17\"", new BigDecimal("25.00"), 30);
+        createPredefined("BALANCING_18", "Balancing Tires 18\"", new BigDecimal("30.00"), 30);
+        createPredefined("BALANCING_19", "Balancing Tires 19\"", new BigDecimal("35.00"), 30);
+        createPredefined("BALANCING_20", "Balancing Tires 20\"", new BigDecimal("40.00"), 30);
     }
 
-    private void createPredefined(String code, String desc, BigDecimal price) {
+    private void createPredefined(String code, String desc, BigDecimal price, Integer duration) {
         Long id = idGenerator.incrementAndGet();
-        ServiceItem item = new ServiceItem(id, code, desc, price);
+        ServiceItem item = new ServiceItem(id, code, desc, price, duration);
         storage.put(item.getId(), item);
     }
 
