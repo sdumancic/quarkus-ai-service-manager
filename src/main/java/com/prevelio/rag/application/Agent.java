@@ -1,4 +1,4 @@
-package com.prevelio.rag;
+package com.prevelio.rag.application;
 
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;

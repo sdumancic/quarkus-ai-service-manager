@@ -1,4 +1,4 @@
-package com.prevelio.rag;
+package com.prevelio.rag.application;
 
 import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.SystemMessage;

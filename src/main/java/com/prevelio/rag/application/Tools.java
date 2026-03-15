@@ -1,4 +1,4 @@
-package com.prevelio.rag;
+package com.prevelio.rag.application;
 
 import java.time.LocalDateTime;
 import java.util.List;

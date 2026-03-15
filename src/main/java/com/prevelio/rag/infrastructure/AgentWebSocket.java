@@ -1,4 +1,6 @@
-package com.prevelio.rag;
+package com.prevelio.rag.infrastructure;
+
+import com.prevelio.rag.application.Agent;
 
 import io.quarkus.websockets.next.OnTextMessage;
 import io.quarkus.websockets.next.PathParam;

@@ -1,4 +1,4 @@
-package com.prevelio.rag;
+package com.prevelio.rag.infrastructure;
 
 import java.net.URISyntaxException;
 import java.nio.file.Paths;

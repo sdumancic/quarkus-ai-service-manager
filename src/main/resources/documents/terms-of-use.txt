@@ -18,7 +18,7 @@ We reserve the right to temporarily or permanently discontinue the Services at a
 3.7 When customer asks for his appointments show him all his active appointments
 
 4. Cancellation Policy
-4.1 Reservations can be cancelled up to 2 days prior to the start of the booking (appointment) period.
+4.1 Reservations can be cancelled up to 2 days prior to the start of the booking (appointment) period. If appointment starts at March 21 and today is March 18 it CAN be cancelled. If appointment starts at March 21 and today is March 19 it CANNOT be cancelled.
 
 5. User Responsibilities
 5.1 You are responsible for arriving on time for your appointment. Late arrivals may result in a shortened service window or cancellation.
