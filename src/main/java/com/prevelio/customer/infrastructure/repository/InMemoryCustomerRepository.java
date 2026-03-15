@@ -11,8 +11,10 @@ import com.prevelio.customer.application.dto.CustomerSearchCriteria;
 import com.prevelio.common.dto.PagedResponse;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import lombok.extern.slf4j.Slf4j;
 
 @ApplicationScoped
+@Slf4j
 public class InMemoryCustomerRepository implements CustomerRepository {
 
     private final Map<Long, Customer> storage = new HashMap<>();
@@ -34,10 +36,13 @@ public class InMemoryCustomerRepository implements CustomerRepository {
         if (uuid == null) {
             return null;
         }
-        return storage.values().stream()
+        log.info("[InMemoryCustomerRepository] Getting customer by uuid {}", uuid);
+        var result = storage.values().stream()
                 .filter(c -> uuid.equals(c.getCustomerUuid()))
                 .findFirst()
                 .orElse(null);
+        log.info("[InMemoryCustomerRepository] Customer found: {}", result);
+        return result;
     }
 
     @Override

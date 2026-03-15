@@ -12,8 +12,9 @@ import com.prevelio.appointment.domain.repository.AppointmentRepository;
 import com.prevelio.service.domain.repository.ServiceRepository;
 
 import com.prevelio.common.lock.DistributedLock;
-import com.prevelio.customer.application.mapper.CustomerMapper;
 import com.prevelio.customer.application.service.CustomerService;
+import com.prevelio.vehicle.application.mapper.VehicleMapper;
+import com.prevelio.vehicle.application.service.VehicleAppService;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -27,13 +28,15 @@ public class AppointmentAppService {
     private final AppointmentRepository repository;
     private final CustomerService customerService;
     private final ServiceRepository serviceRepository;
+    private final VehicleAppService vehicleAppService;
 
     @Inject
     public AppointmentAppService(AppointmentRepository repository, CustomerService customerService,
-            ServiceRepository serviceRepository) {
+            ServiceRepository serviceRepository, VehicleAppService vehicleAppService) {
         this.repository = repository;
         this.customerService = customerService;
         this.serviceRepository = serviceRepository;
+        this.vehicleAppService = vehicleAppService;
     }
 
     public List<AppointmentResponseDto> getAllAppointments() {
@@ -59,6 +62,11 @@ public class AppointmentAppService {
 
     @DistributedLock(key = "create-appointment")
     public AppointmentResponseDto createAppointment(AppointmentRequestDto request) {
+        if (request.getEndDate() == null && request.getStartDate() != null) {
+            long totalMinutes = calculateExpectedDurationMinutes(request.getServiceIds());
+            request.setEndDate(request.getStartDate().plusMinutes(totalMinutes));
+        }
+
         validateRequest(request);
         Appointment model = AppointmentMapper.toDomain(request);
 
@@ -69,8 +77,7 @@ public class AppointmentAppService {
                 model.setCustomerId(customerId);
 
                 if (request.getVehicleUuid() != null) {
-                    com.prevelio.customer.domain.model.Vehicle vehicle = customerService
-                            .getVehicleByUuid(request.getCustomerUuid(), request.getVehicleUuid());
+                    var vehicle = vehicleAppService.getVehicleModelByUuid(request.getVehicleUuid());
                     model.setVehicleId(vehicle.getId());
                 }
             } catch (NotFoundException e) {
@@ -83,6 +90,11 @@ public class AppointmentAppService {
     }
 
     public AppointmentResponseDto updateAppointment(Long id, AppointmentRequestDto request) {
+        if (request.getEndDate() == null && request.getStartDate() != null) {
+            long totalMinutes = calculateExpectedDurationMinutes(request.getServiceIds());
+            request.setEndDate(request.getStartDate().plusMinutes(totalMinutes));
+        }
+        
         validateRequest(request);
         Appointment existing = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException(APPOINTMENT_NOT_FOUND));
@@ -96,8 +108,7 @@ public class AppointmentAppService {
                 existing.setCustomerUuid(request.getCustomerUuid());
 
                 if (request.getVehicleUuid() != null) {
-                    com.prevelio.customer.domain.model.Vehicle vehicle = customerService
-                            .getVehicleByUuid(request.getCustomerUuid(), request.getVehicleUuid());
+                    var vehicle = vehicleAppService.getVehicleModelByUuid(request.getVehicleUuid());
                     existing.setVehicleId(vehicle.getId());
                     existing.setVehicleUuid(request.getVehicleUuid());
                 }
@@ -137,12 +148,10 @@ public class AppointmentAppService {
     }
 
     private AppointmentResponseDto enrichWithVehicleInfo(AppointmentResponseDto dto) {
-        if (dto.getCustomerUuid() != null && dto.getVehicleUuid() != null) {
+        if (dto.getVehicleUuid() != null) {
             try {
-                com.prevelio.customer.domain.model.Vehicle vehicle = customerService.getVehicleByUuid(
-                        dto.getCustomerUuid(),
-                        dto.getVehicleUuid());
-                dto.setVehicle(CustomerMapper.toVehicleResponseDto(vehicle));
+                var vehicle = vehicleAppService.getVehicleModelByUuid(dto.getVehicleUuid());
+                dto.setVehicle(VehicleMapper.toDto(vehicle));
             } catch (NotFoundException e) {
                 // Vehicle might have been deleted or UUID changed, leave null
             }
@@ -151,6 +160,12 @@ public class AppointmentAppService {
     }
 
     private void validateRequest(AppointmentRequestDto request) {
+        if (request.getStartDate() == null) {
+            throw new BadRequestException("Start date is required");
+        }
+        if (request.getEndDate() == null) {
+            throw new BadRequestException("End date is required");
+        }
         if (request.getEndDate().isBefore(request.getStartDate())
                 || request.getEndDate().isEqual(request.getStartDate())) {
             throw new BadRequestException("End date must be after start date");
@@ -165,14 +180,7 @@ public class AppointmentAppService {
         }
 
         // Check duration matches sum of services
-        long expectedDurationMinutes = 0;
-        if (request.getServiceIds() != null) {
-            for (Long serviceId : request.getServiceIds()) {
-                expectedDurationMinutes += serviceRepository.findById(serviceId)
-                        .orElseThrow(() -> new BadRequestException("Service item not found: " + serviceId))
-                        .getDurationInMinutes();
-            }
-        }
+        long expectedDurationMinutes = calculateExpectedDurationMinutes(request.getServiceIds());
 
         long actualDurationMinutes = Duration.between(request.getStartDate(), request.getEndDate()).toMinutes();
         if (actualDurationMinutes != expectedDurationMinutes) {
@@ -193,5 +201,17 @@ public class AppointmentAppService {
         return (dateTime.getMinute() == 0 || dateTime.getMinute() == 30) 
             && dateTime.getSecond() == 0 
             && dateTime.getNano() == 0;
+    }
+
+    private long calculateExpectedDurationMinutes(List<Long> serviceIds) {
+        long duration = 0;
+        if (serviceIds != null) {
+            for (Long serviceId : serviceIds) {
+                duration += serviceRepository.findById(serviceId)
+                        .orElseThrow(() -> new BadRequestException("Service item not found: " + serviceId))
+                        .getDurationInMinutes();
+            }
+        }
+        return duration;
     }
 }

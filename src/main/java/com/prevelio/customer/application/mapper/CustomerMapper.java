@@ -6,10 +6,8 @@ import java.util.UUID;
 
 import com.prevelio.customer.application.dto.CustomerRequestDto;
 import com.prevelio.customer.application.dto.CustomerResponseDto;
-import com.prevelio.customer.application.dto.VehicleResponseDto;
 import com.prevelio.customer.domain.model.Customer;
 import com.prevelio.customer.domain.model.CustomerStatus;
-import com.prevelio.customer.domain.model.Vehicle;
 
 public class CustomerMapper {
     private CustomerMapper() {
@@ -51,24 +49,7 @@ public class CustomerMapper {
         customerResponseDto.setCreatedAt(customer.getCreatedAt());
         customerResponseDto.setUpdatedAt(customer.getUpdatedAt());
         customerResponseDto.setCustomerUuid(customer.getCustomerUuid());
-        if (customer.getVehicles() != null) {
-            customerResponseDto.setVehicles(customer.getVehicles().stream()
-                    .map(CustomerMapper::toVehicleResponseDto)
-                    .toList());
-        }
         return customerResponseDto;
     }
-
-    public static VehicleResponseDto toVehicleResponseDto(Vehicle vehicle) {
-        VehicleResponseDto dto = new VehicleResponseDto();
-        dto.setId(vehicle.getId());
-        dto.setVehicleUuid(vehicle.getVehicleUuid());
-        dto.setMake(vehicle.getMake());
-        dto.setModel(vehicle.getModel());
-        dto.setYear(vehicle.getYear());
-        dto.setLicensePlate(vehicle.getLicensePlate());
-        dto.setVin(vehicle.getVin());
-        dto.setColor(vehicle.getColor());
-        return dto;
-    }
 }
+

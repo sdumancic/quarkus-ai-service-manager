@@ -4,22 +4,23 @@ import com.prevelio.customer.application.dto.CustomerRequestDto;
 import com.prevelio.customer.application.service.CustomerService;
 import com.prevelio.customer.domain.model.Customer;
 import com.prevelio.customer.domain.model.CustomerStatus;
-import com.prevelio.customer.domain.model.Vehicle;
+import com.prevelio.vehicle.application.dto.VehicleRequestDto;
+import com.prevelio.vehicle.application.service.VehicleAppService;
 import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.UUID;
 
 @Slf4j
 @ApplicationScoped
 public class CustomerStartup {
 
     private final CustomerService customerService;
+    private final VehicleAppService vehicleAppService;
 
-    public CustomerStartup(CustomerService customerService) {
+    public CustomerStartup(CustomerService customerService, VehicleAppService vehicleAppService) {
         this.customerService = customerService;
+        this.vehicleAppService = vehicleAppService;
     }
 
     void onStart(@Observes StartupEvent ev) {
@@ -46,20 +47,20 @@ public class CustomerStartup {
     }
 
     private void addSampleVehicles(Customer customer) {
-        Vehicle v1 = new Vehicle();
-        v1.setVehicleUuid(UUID.randomUUID());
+        VehicleRequestDto v1 = new VehicleRequestDto();
+        v1.setCustomerUuid(customer.getCustomerUuid());
         v1.setMake("Toyota");
         v1.setModel("Camry");
         v1.setYear(2020);
         v1.setLicensePlate("ABC-123" + customer.getId());
-        customerService.addVehicle(customer.getId(), v1);
+        vehicleAppService.createVehicle(v1);
 
-        Vehicle v2 = new Vehicle();
-        v2.setVehicleUuid(UUID.randomUUID());
+        VehicleRequestDto v2 = new VehicleRequestDto();
+        v2.setCustomerUuid(customer.getCustomerUuid());
         v2.setMake("Honda");
         v2.setModel("Civic");
         v2.setYear(2022);
         v2.setLicensePlate("XYZ-789" + customer.getId());
-        customerService.addVehicle(customer.getId(), v2);
+        vehicleAppService.createVehicle(v2);
     }
 }

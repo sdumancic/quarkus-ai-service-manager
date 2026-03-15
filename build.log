@@ -1,0 +1,105 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------< com.prevelio:quarkus-ai-service-manager >---------------
+[INFO] Building quarkus-ai-service-manager 1.0.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] ------------------------------[ quarkus ]-------------------------------
+[WARNING] The artifact io.quarkus:quarkus-junit5-mockito:jar:3.32.3 has been relocated to io.quarkus:quarkus-junit-mockito:jar:3.32.3: Update the artifactId in your project build file. Refer to https://github.com/quarkusio/quarkus/wiki/Migration-Guide-3.31 for more information.
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ quarkus-ai-service-manager ---
+[INFO] Copying 4 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- quarkus:3.32.3:generate-code (default-generate-code) @ quarkus-ai-service-manager ---
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ quarkus-ai-service-manager ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- jandex:3.1.2:jandex (make-index) @ quarkus-ai-service-manager ---
+[INFO] Saving Jandex index: D:\dev\quarkus-ai-service-manager\target\classes\META-INF\jandex.idx
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ quarkus-ai-service-manager ---
+[INFO] Copying 1 resource from src\test\resources to target\test-classes
+[INFO] 
+[INFO] --- quarkus:3.32.3:generate-code-tests (default-generate-code-tests) @ quarkus-ai-service-manager ---
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ quarkus-ai-service-manager ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- surefire:3.5.4:test (default-test) @ quarkus-ai-service-manager ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.prevelio.common.lock.DistributedLockInterceptorTest
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (C:\Users\sanjin\.m2\repository\net\bytebuddy\byte-buddy-agent\1.17.8\byte-buddy-agent-1.17.8.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+Java HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+[ERROR] Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.946 s <<< FAILURE! -- in com.prevelio.common.lock.DistributedLockInterceptorTest
+[ERROR] com.prevelio.common.lock.DistributedLockInterceptorTest.testSuccessfulLockAcquisition -- Time elapsed: 0.809 s <<< ERROR!
+org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+
+Unnecessary stubbings detected.
+Clean & maintainable test code requires zero unnecessary code.
+Following stubbings are unnecessary (click to navigate to relevant line of code):
+  1. -> at com.prevelio.common.lock.DistributedLockInterceptorTest.testSuccessfulLockAcquisition(DistributedLockInterceptorTest.java:39)
+Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+	at org.mockito.junit.jupiter.MockitoExtension.lambda$afterEach$2(MockitoExtension.java:200)
+	at java.base/java.util.Optional.ifPresent(Optional.java:178)
+	at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:198)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+[ERROR] com.prevelio.common.lock.DistributedLockInterceptorTest.testFailedLockAcquisitionThrowsException -- Time elapsed: 0.116 s <<< ERROR!
+org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+
+Unnecessary stubbings detected.
+Clean & maintainable test code requires zero unnecessary code.
+Following stubbings are unnecessary (click to navigate to relevant line of code):
+  1. -> at com.prevelio.common.lock.DistributedLockInterceptorTest.testFailedLockAcquisitionThrowsException(DistributedLockInterceptorTest.java:68)
+Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+	at org.mockito.junit.jupiter.MockitoExtension.lambda$afterEach$2(MockitoExtension.java:200)
+	at java.base/java.util.Optional.ifPresent(Optional.java:178)
+	at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:198)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Errors: 
+[ERROR]   DistributedLockInterceptorTest.testFailedLockAcquisitionThrowsException » UnnecessaryStubbing 
+Unnecessary stubbings detected.
+Clean & maintainable test code requires zero unnecessary code.
+Following stubbings are unnecessary (click to navigate to relevant line of code):
+  1. -> at com.prevelio.common.lock.DistributedLockInterceptorTest.testFailedLockAcquisitionThrowsException(DistributedLockInterceptorTest.java:68)
+Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+[ERROR]   DistributedLockInterceptorTest.testSuccessfulLockAcquisition » UnnecessaryStubbing 
+Unnecessary stubbings detected.
+Clean & maintainable test code requires zero unnecessary code.
+Following stubbings are unnecessary (click to navigate to relevant line of code):
+  1. -> at com.prevelio.common.lock.DistributedLockInterceptorTest.testSuccessfulLockAcquisition(DistributedLockInterceptorTest.java:39)
+Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+[INFO] 
+[ERROR] Tests run: 2, Failures: 0, Errors: 2, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  10.651 s
+[INFO] Finished at: 2026-03-15T12:25:23+01:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.4:test (default-test) on project quarkus-ai-service-manager: 
+[ERROR] 
+[ERROR] See D:\dev\quarkus-ai-service-manager\target\surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

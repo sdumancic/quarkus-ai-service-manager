@@ -16,7 +16,7 @@ public class AppointmentResponseDto {
     private UUID customerUuid;
     private Long vehicleId;
     private UUID vehicleUuid;
-    private com.prevelio.customer.application.dto.VehicleResponseDto vehicle;
+    private com.prevelio.vehicle.application.dto.VehicleResponseDto vehicle;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private List<Long> serviceIds;

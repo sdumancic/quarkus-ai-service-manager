@@ -1,4 +1,4 @@
-package com.prevelio.customer.domain.model;
+package com.prevelio.vehicle.domain.model;
 
 import java.util.UUID;
 
@@ -16,11 +16,13 @@ import lombok.ToString;
 public class Vehicle {
     private Long id;
     private UUID vehicleUuid;
-    private Long ownerId;
+    private Long customerId;
+    private UUID customerUuid;
     private String make;
     private String model;
     private Integer year;
     private String licensePlate;
     private String vin;
     private String color;
+    private boolean active = true;
 }

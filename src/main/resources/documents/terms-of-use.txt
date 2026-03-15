@@ -14,7 +14,8 @@ We reserve the right to temporarily or permanently discontinue the Services at a
 3.3 All bookings are subject to vehicle availability.
 3.4 Bookings are rounded to the nearest half hour.
 3.5 Duration of booking is determined by the sum of the durations of the services booked.
-3.6 Appointments cannot be scheduled or end within the next 3 days.
+3.6 Appointments cannot be scheduled or end within the next 3 days from current date.
+3.7 When customer asks for his appointments show him all his active appointments
 
 4. Cancellation Policy
 4.1 Reservations can be cancelled up to 2 days prior to the start of the booking (appointment) period.

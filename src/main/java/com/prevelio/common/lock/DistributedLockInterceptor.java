@@ -1,7 +1,6 @@
 package com.prevelio.common.lock;
 
 import io.quarkus.redis.datasource.RedisDataSource;
-import io.quarkus.redis.datasource.value.SetArgs;
 import io.quarkus.redis.datasource.value.ValueCommands;
 import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
@@ -12,15 +11,15 @@ import jakarta.interceptor.InvocationContext;
 import java.util.UUID;
 
 @DistributedLock
-@Priority(Interceptor.Priority.APPLICATION)
+@Priority(1)
+@io.quarkus.arc.Unremovable
 @Interceptor
 public class DistributedLockInterceptor {
 
-    private final RedisDataSource redisDataSource;
-
     @Inject
-    public DistributedLockInterceptor(RedisDataSource redisDataSource) {
-        this.redisDataSource = redisDataSource;
+    RedisDataSource redisDataSource;
+
+    public DistributedLockInterceptor() {
     }
 
     @AroundInvoke
@@ -28,6 +27,21 @@ public class DistributedLockInterceptor {
         DistributedLock lockAnnotation = context.getMethod().getAnnotation(DistributedLock.class);
         if (lockAnnotation == null) {
             lockAnnotation = context.getTarget().getClass().getAnnotation(DistributedLock.class);
+        }
+
+        if (lockAnnotation == null) {
+            // Check bindings as last resort
+            for (java.lang.annotation.Annotation binding : context.getInterceptorBindings()) {
+                if (binding instanceof DistributedLock lock) {
+                    lockAnnotation = lock;
+                    break;
+                }
+            }
+        }
+
+        if (lockAnnotation == null) {
+            // Technically unreachable if triggered by the binding, but good for safety
+            return context.proceed();
         }
 
         String lockKey = "dlock:" + lockAnnotation.key();
@@ -43,13 +57,15 @@ public class DistributedLockInterceptor {
         try {
             while (System.currentTimeMillis() - start < waitTimeMs) {
                 // Try to acquire the lock atomically (SET NX PX)
-                // This ensures the lock and expiration are set in a single command
+                // We use execute because ValueCommands.set returns void and doesn't tell us if it succeeded
                 try {
-                    valueCommands.set(lockKey, lockValue, new SetArgs().nx().px(leaseTimeMs));
-                    locked = true;
-                    break;
+                    var response = redisDataSource.execute("SET", lockKey, lockValue, "NX", "PX", String.valueOf(leaseTimeMs));
+                    if (response != null && "OK".equalsIgnoreCase(response.toString())) {
+                        locked = true;
+                        break;
+                    }
                 } catch (Exception e) {
-                    // If set fails (usually returns null or throws if NX is not met), we retry
+                    // Log error if needed
                 }
 
                 try {

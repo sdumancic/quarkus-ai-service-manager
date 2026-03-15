@@ -13,12 +13,13 @@ import com.prevelio.customer.domain.model.Customer;
 import io.quarkus.cache.CacheResult;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.NotFoundException;
+import lombok.extern.slf4j.Slf4j;
 
 @ApplicationScoped
+@Slf4j
 public class CustomerService {
 
     private final CustomerRepository customerRepository;
-    private final java.util.concurrent.atomic.AtomicLong vehicleIdGenerator = new java.util.concurrent.atomic.AtomicLong(0);
 
     public CustomerService(CustomerRepository customerRepository) {
         this.customerRepository = customerRepository;
@@ -34,19 +35,13 @@ public class CustomerService {
 
     @CacheResult(cacheName = "customer-cache")
     public Customer getCustomerByUuid(UUID uuid) {
+        log.info("[CustomerService] Getting customer by uuid {}", uuid);
         Customer customer = customerRepository.getCustomerByUuid(uuid);
         if (customer == null) {
             throw new NotFoundException("Customer not found");
         }
+        log.info("[CustomerService] Customer found: {}", customer);
         return customer;
-    }
-
-    public com.prevelio.customer.domain.model.Vehicle getVehicleByUuid(UUID customerUuid, UUID vehicleUuid) {
-        Customer customer = getCustomerByUuid(customerUuid);
-        return customer.getVehicles().stream()
-                .filter(v -> v.getVehicleUuid().equals(vehicleUuid))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("Vehicle not found for this customer"));
     }
 
     public PagedResponse<Customer> searchCustomers(CustomerSearchCriteria criteria) {
@@ -68,19 +63,6 @@ public class CustomerService {
         if (customer != null) {
             customerRepository.deleteCustomer(customer);
         }
-    }
-
-    public void addVehicle(Long customerId, com.prevelio.customer.domain.model.Vehicle vehicle) {
-        Customer customer = getCustomerById(customerId);
-        if (vehicle.getVehicleUuid() == null) {
-            vehicle.setVehicleUuid(UUID.randomUUID());
-        }
-        if (vehicle.getId() == null) {
-            vehicle.setId(vehicleIdGenerator.incrementAndGet());
-        }
-        vehicle.setOwnerId(customerId);
-        customer.getVehicles().add(vehicle);
-        customerRepository.updateCustomer(customer);
     }
 
 }

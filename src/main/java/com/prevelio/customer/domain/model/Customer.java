@@ -1,8 +1,6 @@
 package com.prevelio.customer.domain.model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
@@ -28,7 +26,6 @@ public class Customer {
     private String zip;
     private String country;
     private CustomerStatus status;
-    private List<Vehicle> vehicles = new ArrayList<>();
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

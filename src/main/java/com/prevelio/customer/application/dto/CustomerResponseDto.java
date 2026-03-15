@@ -1,7 +1,6 @@
 package com.prevelio.customer.application.dto;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import com.prevelio.customer.domain.model.CustomerStatus;
@@ -31,5 +30,4 @@ public class CustomerResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private UUID customerUuid;
-    private List<VehicleResponseDto> vehicles;
 }
