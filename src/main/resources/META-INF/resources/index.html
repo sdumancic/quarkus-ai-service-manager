@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Service Manager | Chat</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div style="display: flex; align-items: center;">
+                <div class="status-dot"></div>
+                <h1>Service Agent</h1>
+            </div>
+            <div class="customer-config">
+                <span style="font-size: 0.8rem; color: var(--text-muted);">Customer UUID:</span>
+                <input type="text" id="customer-uuid" placeholder="Enter UUID..." value="ed639238-4834-4423-8bfd-9817ff0242be">
+            </div>
+        </header>
+
+        <main class="chat-container" id="chat-window">
+            <div class="message agent-message">
+                Hello! I'm your AI Service Assistant. How can I help you today with your vehicles or appointments?
+            </div>
+        </main>
+
+        <footer>
+            <div class="input-area">
+                <input type="text" id="message-input" placeholder="Type your message here..." autocomplete="off">
+                <button id="send-btn">
+                    <span>Send</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
