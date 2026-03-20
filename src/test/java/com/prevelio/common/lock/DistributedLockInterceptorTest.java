@@ -1,7 +1,7 @@
 package com.prevelio.common.lock;
 
 import io.quarkus.redis.datasource.RedisDataSource;
-import io.quarkus.redis.datasource.value.ValueCommands;
+import io.quarkus.redis.datasource.keys.KeyCommands;
 import jakarta.interceptor.InvocationContext;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Method;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,7 +27,7 @@ class DistributedLockInterceptorTest {
     private InvocationContext invocationContext;
 
     @Mock
-    private ValueCommands<String, String> valueCommands;
+    private KeyCommands<String> keyCommands;
 
     @InjectMocks
     private DistributedLockInterceptor interceptor;
@@ -35,8 +36,8 @@ class DistributedLockInterceptorTest {
     void testSuccessfulLockAcquisition() throws Exception {
         // Setup mock method with annotation
         Method method = MockService.class.getMethod("lockMethod");
-        when(invocationContext.getMethod()).thenReturn(method);
-        lenient().when(invocationContext.getTarget()).thenReturn(new MockService());
+        DistributedLock lockAnnotation = method.getAnnotation(DistributedLock.class);
+        when(invocationContext.getInterceptorBindings()).thenReturn(Set.of(lockAnnotation));
         
         // Mock Redis SET NX PX
         io.vertx.mutiny.redis.client.Response okResponse = mock(io.vertx.mutiny.redis.client.Response.class);
@@ -44,9 +45,13 @@ class DistributedLockInterceptorTest {
         when(redisDataSource.execute(eq("SET"), anyString(), anyString(), eq("NX"), eq("PX"), anyString()))
                 .thenReturn(okResponse);
         
-        // Mock redisDataSource.value(String.class) for the unlock check
-        when(redisDataSource.value(String.class)).thenReturn(valueCommands);
+        // Mock Redis GET for unlock check - using lenient since it might not match the random value
+        io.vertx.mutiny.redis.client.Response getResponse = mock(io.vertx.mutiny.redis.client.Response.class);
+        lenient().when(redisDataSource.execute(eq("GET"), anyString())).thenReturn(getResponse);
         
+        // Mock redisDataSource.key() - lenient because if GET value doesn't match random UUID, it won't be called
+        lenient().when(redisDataSource.key()).thenReturn(keyCommands);
+
         // Mock proceed()
         when(invocationContext.proceed()).thenReturn("Method Result");
 
@@ -56,7 +61,6 @@ class DistributedLockInterceptorTest {
         // Assert
         assertEquals("Method Result", result);
         verify(invocationContext, times(1)).proceed();
-        // Verify we tried to SET at least once
         verify(redisDataSource, atLeastOnce()).execute(eq("SET"), anyString(), anyString(), eq("NX"), eq("PX"), anyString());
     }
 
@@ -64,15 +68,16 @@ class DistributedLockInterceptorTest {
     void testFailedLockAcquisitionThrowsException() throws Exception {
         // Setup mock method
         Method method = MockService.class.getMethod("lockMethodWithShortTimeout");
-        when(invocationContext.getMethod()).thenReturn(method);
-        lenient().when(invocationContext.getTarget()).thenReturn(new MockService());
+        DistributedLock lockAnnotation = method.getAnnotation(DistributedLock.class);
+        when(invocationContext.getInterceptorBindings()).thenReturn(Set.of(lockAnnotation));
         
         // Mock Redis failure (returning null meaning lock not acquired)
         when(redisDataSource.execute(eq("SET"), anyString(), anyString(), eq("NX"), eq("PX"), anyString()))
                 .thenReturn(null);
 
         // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> interceptor.manageLock(invocationContext));
+        DistributedLockAcquisitionException exception = assertThrows(DistributedLockAcquisitionException.class, 
+            () -> interceptor.manageLock(invocationContext));
         assertTrue(exception.getMessage().contains("Could not acquire distributed lock"));
         
         verify(invocationContext, never()).proceed();
