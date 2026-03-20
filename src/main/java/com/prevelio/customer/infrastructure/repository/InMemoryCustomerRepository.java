@@ -48,10 +48,10 @@ public class InMemoryCustomerRepository implements CustomerRepository {
     @Override
     public PagedResponse<Customer> searchCustomers(CustomerSearchCriteria criteria) {
         java.util.List<Customer> filtered = storage.values().stream()
-                .filter(c -> criteria.getName() == null || (c.getName() != null
-                        && c.getName().toLowerCase().contains(criteria.getName().toLowerCase())))
-                .filter(c -> criteria.getEmail() == null || (c.getEmail() != null
-                        && c.getEmail().toLowerCase().contains(criteria.getEmail().toLowerCase())))
+                .filter(c -> criteria.name() == null || (c.getName() != null
+                        && c.getName().toLowerCase().contains(criteria.name().toLowerCase())))
+                .filter(c -> criteria.email() == null || (c.getEmail() != null
+                        && c.getEmail().toLowerCase().contains(criteria.email().toLowerCase())))
                 .toList();
 
         long totalItems = filtered.size();

@@ -48,11 +48,9 @@ public class AppointmentStartup {
         log.info("Generating sample appointments for customers...");
 
         // Fetch all customers using an empty criteria
-        CustomerSearchCriteria emptyCriteria = new CustomerSearchCriteria();
-        emptyCriteria.setPageIndex(0);
-        emptyCriteria.setPageSize(100);
+        CustomerSearchCriteria emptyCriteria = new CustomerSearchCriteria(null, null, 0, 100);
         PagedResponse<Customer> response = customerService.searchCustomers(emptyCriteria);
-        List<Customer> customers = response.getData();
+        List<Customer> customers = response.data();
 
         if (customers == null || customers.isEmpty()) {
             log.warn("No customers found to attach sample appointments.");
@@ -69,8 +67,8 @@ public class AppointmentStartup {
     }
 
     private void generateInactiveAppointments(Customer customer, List<VehicleResponseDto> vehicles) {
-        UUID vehicleUuid = vehicles.isEmpty() ? null : vehicles.get(0).getVehicleUuid();
-        Long vehicleId = vehicles.isEmpty() ? null : vehicles.get(0).getId();
+        UUID vehicleUuid = vehicles.isEmpty() ? null : vehicles.get(0).vehicleUuid();
+        Long vehicleId = vehicles.isEmpty() ? null : vehicles.get(0).id();
 
         for (int i = 1; i <= 5; i++) {
             LocalDateTime startDate = LocalDateTime.now().minusDays(30L + i).withMinute(0).withSecond(0).withNano(0);
@@ -92,27 +90,30 @@ public class AppointmentStartup {
 
         for (int i = 1; i <= 2; i++) {
             LocalDateTime startDate = LocalDateTime.now().plusDays(5L + i).withMinute(30).withSecond(0).withNano(0);
-            AppointmentRequestDto request = new AppointmentRequestDto();
-            request.setCustomerUuid(customer.getCustomerUuid());
-            request.setVehicleUuid(vehicleUuid);
-            request.setStartDate(startDate);
-
+            
             List<Long> services = new ArrayList<>();
             services.add(1L); // Tire Change (30m)
             services.add(11L); // Balancing (30m)
 
-            request.setEndDate(startDate.plusMinutes(60)); // Sum = 60m
-            request.setServiceIds(services);
+            AppointmentRequestDto request = new AppointmentRequestDto(
+                customer.getCustomerUuid(),
+                vehicleUuid,
+                startDate,
+                startDate.plusMinutes(60), // Sum = 60m
+                services,
+                null
+            );
+
             appointmentAppService.createAppointment(request);
         }
     }
 
     private UUID getPrimaryOrSecondaryVehicleUuid(List<VehicleResponseDto> vehicles) {
         if (vehicles.size() > 1) {
-            return vehicles.get(1).getVehicleUuid();
+            return vehicles.get(1).vehicleUuid();
         }
         if (!vehicles.isEmpty()) {
-            return vehicles.get(0).getVehicleUuid();
+            return vehicles.get(0).vehicleUuid();
         }
         return null;
     }

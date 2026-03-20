@@ -62,22 +62,22 @@ public class AppointmentAppService {
 
     @DistributedLock(key = "create-appointment")
     public AppointmentResponseDto createAppointment(AppointmentRequestDto request) {
-        if (request.getEndDate() == null && request.getStartDate() != null) {
-            long totalMinutes = calculateExpectedDurationMinutes(request.getServiceIds());
-            request.setEndDate(request.getStartDate().plusMinutes(totalMinutes));
+        if (request.endDate() == null && request.startDate() != null) {
+            long totalMinutes = calculateExpectedDurationMinutes(request.serviceIds());
+            request = request.withEndDate(request.startDate().plusMinutes(totalMinutes));
         }
 
         validateRequest(request);
         Appointment model = AppointmentMapper.toDomain(request);
 
         // Resolve customerId and vehicleId
-        if (request.getCustomerUuid() != null) {
+        if (request.customerUuid() != null) {
             try {
-                Long customerId = customerService.getCustomerByUuid(request.getCustomerUuid()).getId();
+                Long customerId = customerService.getCustomerByUuid(request.customerUuid()).getId();
                 model.setCustomerId(customerId);
 
-                if (request.getVehicleUuid() != null) {
-                    var vehicle = vehicleAppService.getVehicleModelByUuid(request.getVehicleUuid());
+                if (request.vehicleUuid() != null) {
+                    var vehicle = vehicleAppService.getVehicleModelByUuid(request.vehicleUuid());
                     model.setVehicleId(vehicle.getId());
                 }
             } catch (NotFoundException e) {
@@ -90,9 +90,9 @@ public class AppointmentAppService {
     }
 
     public AppointmentResponseDto updateAppointment(Long id, AppointmentRequestDto request) {
-        if (request.getEndDate() == null && request.getStartDate() != null) {
-            long totalMinutes = calculateExpectedDurationMinutes(request.getServiceIds());
-            request.setEndDate(request.getStartDate().plusMinutes(totalMinutes));
+        if (request.endDate() == null && request.startDate() != null) {
+            long totalMinutes = calculateExpectedDurationMinutes(request.serviceIds());
+            request = request.withEndDate(request.startDate().plusMinutes(totalMinutes));
         }
         
         validateRequest(request);
@@ -101,16 +101,16 @@ public class AppointmentAppService {
 
         Appointment updatedModel = AppointmentMapper.toDomain(request);
 
-        if (request.getCustomerUuid() != null) {
+        if (request.customerUuid() != null) {
             try {
-                Long customerId = customerService.getCustomerByUuid(request.getCustomerUuid()).getId();
+                Long customerId = customerService.getCustomerByUuid(request.customerUuid()).getId();
                 existing.setCustomerId(customerId);
-                existing.setCustomerUuid(request.getCustomerUuid());
+                existing.setCustomerUuid(request.customerUuid());
 
-                if (request.getVehicleUuid() != null) {
-                    var vehicle = vehicleAppService.getVehicleModelByUuid(request.getVehicleUuid());
+                if (request.vehicleUuid() != null) {
+                    var vehicle = vehicleAppService.getVehicleModelByUuid(request.vehicleUuid());
                     existing.setVehicleId(vehicle.getId());
-                    existing.setVehicleUuid(request.getVehicleUuid());
+                    existing.setVehicleUuid(request.vehicleUuid());
                 }
             } catch (NotFoundException e) {
                 throw new BadRequestException(e.getMessage());
@@ -148,10 +148,10 @@ public class AppointmentAppService {
     }
 
     private AppointmentResponseDto enrichWithVehicleInfo(AppointmentResponseDto dto) {
-        if (dto.getVehicleUuid() != null) {
+        if (dto.vehicleUuid() != null) {
             try {
-                var vehicle = vehicleAppService.getVehicleModelByUuid(dto.getVehicleUuid());
-                dto.setVehicle(VehicleMapper.toDto(vehicle));
+                var vehicle = vehicleAppService.getVehicleModelByUuid(dto.vehicleUuid());
+                return dto.withVehicle(VehicleMapper.toDto(vehicle));
             } catch (NotFoundException e) {
                 // Vehicle might have been deleted or UUID changed, leave null
             }
@@ -160,39 +160,39 @@ public class AppointmentAppService {
     }
 
     private void validateRequest(AppointmentRequestDto request) {
-        if (request.getStartDate() == null) {
+        if (request.startDate() == null) {
             throw new BadRequestException("Start date is required");
         }
-        if (request.getEndDate() == null) {
+        if (request.endDate() == null) {
             throw new BadRequestException("End date is required");
         }
-        if (request.getEndDate().isBefore(request.getStartDate())
-                || request.getEndDate().isEqual(request.getStartDate())) {
+        if (request.endDate().isBefore(request.startDate())
+                || request.endDate().isEqual(request.startDate())) {
             throw new BadRequestException("End date must be after start date");
         }
 
         // Check 30-minute slots
-        if (!isRoundedToHalfHour(request.getStartDate())) {
+        if (!isRoundedToHalfHour(request.startDate())) {
             throw new BadRequestException("Start date must be rounded to half hour (e.g. 10:00, 10:30)");
         }
-        if (!isRoundedToHalfHour(request.getEndDate())) {
+        if (!isRoundedToHalfHour(request.endDate())) {
             throw new BadRequestException("End date must be rounded to half hour (e.g. 10:00, 10:30)");
         }
 
         // Check duration matches sum of services
-        long expectedDurationMinutes = calculateExpectedDurationMinutes(request.getServiceIds());
+        long expectedDurationMinutes = calculateExpectedDurationMinutes(request.serviceIds());
 
-        long actualDurationMinutes = Duration.between(request.getStartDate(), request.getEndDate()).toMinutes();
+        long actualDurationMinutes = Duration.between(request.startDate(), request.endDate()).toMinutes();
         if (actualDurationMinutes != expectedDurationMinutes) {
             throw new BadRequestException("Appointment duration (" + actualDurationMinutes 
                 + " min) does not match required service duration (" + expectedDurationMinutes + " min)");
         }
 
         LocalDateTime minAllowedDate = LocalDateTime.now().plusDays(3);
-        if (request.getEndDate().isBefore(minAllowedDate)) {
+        if (request.endDate().isBefore(minAllowedDate)) {
             throw new BadRequestException("Appointments cannot be scheduled or end within the next 3 days");
         }
-        if (request.getStartDate().isBefore(minAllowedDate)) {
+        if (request.startDate().isBefore(minAllowedDate)) {
             throw new BadRequestException("Appointments cannot be scheduled or start within the next 3 days");
         }
     }

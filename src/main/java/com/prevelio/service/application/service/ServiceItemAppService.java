@@ -44,10 +44,10 @@ public class ServiceItemAppService {
         ServiceItem existing = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Service item not found"));
         
-        existing.setCode(request.getCode());
-        existing.setDescription(request.getDescription());
-        existing.setPrice(request.getPrice());
-        existing.setDurationInMinutes(request.getDurationInMinutes());
+        existing.setCode(request.code());
+        existing.setDescription(request.description());
+        existing.setPrice(request.price());
+        existing.setDurationInMinutes(request.durationInMinutes());
         
         ServiceItem updated = repository.update(existing);
         return ServiceItemMapper.toDto(updated);

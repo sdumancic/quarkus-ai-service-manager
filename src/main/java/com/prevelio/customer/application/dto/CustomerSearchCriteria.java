@@ -1,25 +1,13 @@
 package com.prevelio.customer.application.dto;
 
 import jakarta.ws.rs.QueryParam;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
-public class CustomerSearchCriteria {
-    
-    @QueryParam("name")
-    private String name;
-
-    @QueryParam("email")
-    private String email;
-
-    @QueryParam("pageIndex")
-    private Integer pageIndex;
-
-    @QueryParam("pageSize")
-    private Integer pageSize;
-
+public record CustomerSearchCriteria(
+    @QueryParam("name") String name,
+    @QueryParam("email") String email,
+    @QueryParam("pageIndex") Integer pageIndex,
+    @QueryParam("pageSize") Integer pageSize
+) {
     public int getPageIndexOrDefault() {
         return pageIndex != null ? pageIndex : 0;
     }

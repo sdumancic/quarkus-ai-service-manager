@@ -59,15 +59,16 @@ public class Tools {
     public VehicleResponseDto createNewVehicle(@ToolMemoryId UUID customerUuid, String make, String model, int year,
             String licensePlate, String vin, String color) {
         log.info("[TOOL] Creating new vehicle for customerUuid: {}", customerUuid);
-        VehicleRequestDto request = new VehicleRequestDto();
-        request.setCustomerUuid(customerUuid);
-        request.setMake(make);
-        request.setModel(model);
-        request.setYear(year);
-        request.setLicensePlate(licensePlate);
-        request.setVin(vin);
-        request.setColor(color);
-        request.setActive(true);
+        VehicleRequestDto request = new VehicleRequestDto(
+            customerUuid,
+            make,
+            model,
+            year,
+            licensePlate,
+            vin,
+            color,
+            true
+        );
         return vehicleAppService.createVehicle(request);
     }
 
@@ -83,11 +84,14 @@ public class Tools {
             List<Long> serviceIds,
             LocalDateTime startTime) {
         log.info("[TOOL] Creating new appointment for customerUuid: {}", customerUuid);
-        AppointmentRequestDto request = new AppointmentRequestDto();
-        request.setCustomerUuid(customerUuid);
-        request.setVehicleUuid(UUID.fromString(vehicleUuid));
-        request.setServiceIds(serviceIds);
-        request.setStartDate(startTime);
+        AppointmentRequestDto request = new AppointmentRequestDto(
+            customerUuid,
+            UUID.fromString(vehicleUuid),
+            startTime,
+            null,
+            serviceIds,
+            null
+        );
         return appointmentAppService.createAppointment(request);
     }
 
@@ -96,12 +100,14 @@ public class Tools {
             List<Long> serviceIds,
             LocalDateTime startTime, LocalDateTime endTime) {
         log.info("[TOOL] Updating appointment for customerUuid: {}", customerUuid);
-        AppointmentRequestDto request = new AppointmentRequestDto();
-        request.setCustomerUuid(customerUuid);
-        request.setVehicleUuid(UUID.fromString(vehicleUuid));
-        request.setServiceIds(serviceIds);
-        request.setStartDate(startTime);
-        request.setEndDate(endTime);
+        AppointmentRequestDto request = new AppointmentRequestDto(
+            customerUuid,
+            UUID.fromString(vehicleUuid),
+            startTime,
+            endTime,
+            serviceIds,
+            null
+        );
         return appointmentAppService.updateAppointment(id, request);
     }
 
@@ -117,15 +123,16 @@ public class Tools {
             int year,
             String licensePlate, String vin, String color) {
         log.info("[TOOL] Updating vehicle for customerUuid: {}", customerUuid);
-        VehicleRequestDto request = new VehicleRequestDto();
-        request.setCustomerUuid(customerUuid);
-        request.setMake(make);
-        request.setModel(model);
-        request.setYear(year);
-        request.setLicensePlate(licensePlate);
-        request.setVin(vin);
-        request.setColor(color);
-        request.setActive(true);
+        VehicleRequestDto request = new VehicleRequestDto(
+            customerUuid,
+            make,
+            model,
+            year,
+            licensePlate,
+            vin,
+            color,
+            true
+        );
         return vehicleAppService.updateVehicle(UUID.fromString(vehicleUuid), request);
     }
 

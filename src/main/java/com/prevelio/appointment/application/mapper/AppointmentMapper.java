@@ -1,7 +1,5 @@
 package com.prevelio.appointment.application.mapper;
 
-
-
 import com.prevelio.appointment.application.dto.AppointmentRequestDto;
 import com.prevelio.appointment.application.dto.AppointmentResponseDto;
 import com.prevelio.appointment.application.dto.StoredTireDto;
@@ -16,15 +14,15 @@ public class AppointmentMapper {
 
     public static Appointment toDomain(AppointmentRequestDto dto) {
         Appointment model = new Appointment();
-        model.setCustomerUuid(dto.getCustomerUuid());
-        model.setVehicleUuid(dto.getVehicleUuid());
-        model.setStartDate(dto.getStartDate());
-        model.setEndDate(dto.getEndDate());
-        if (dto.getServiceIds() != null) {
-            model.setServiceIds(dto.getServiceIds());
+        model.setCustomerUuid(dto.customerUuid());
+        model.setVehicleUuid(dto.vehicleUuid());
+        model.setStartDate(dto.startDate());
+        model.setEndDate(dto.endDate());
+        if (dto.serviceIds() != null) {
+            model.setServiceIds(dto.serviceIds());
         }
-        if (dto.getStoredTires() != null) {
-            model.setStoredTires(dto.getStoredTires().stream()
+        if (dto.storedTires() != null) {
+            model.setStoredTires(dto.storedTires().stream()
                     .map(AppointmentMapper::toStoredTire)
                     .toList());
         }
@@ -32,41 +30,40 @@ public class AppointmentMapper {
     }
 
     public static AppointmentResponseDto toDto(Appointment model) {
-        AppointmentResponseDto dto = new AppointmentResponseDto();
-        dto.setId(model.getId());
-        dto.setCustomerId(model.getCustomerId());
-        dto.setCustomerUuid(model.getCustomerUuid());
-        dto.setVehicleId(model.getVehicleId());
-        dto.setVehicleUuid(model.getVehicleUuid());
-        dto.setStartDate(model.getStartDate());
-        dto.setEndDate(model.getEndDate());
-        dto.setServiceIds(model.getServiceIds());
-        dto.setStatus(model.getStatus().name());
-        if (model.getStoredTires() != null) {
-            dto.setStoredTires(model.getStoredTires().stream()
+        return new AppointmentResponseDto(
+            model.getId(),
+            model.getCustomerId(),
+            model.getCustomerUuid(),
+            model.getVehicleId(),
+            model.getVehicleUuid(),
+            null, // vehicle is enriched later in service layer
+            model.getStartDate(),
+            model.getEndDate(),
+            model.getServiceIds(),
+            model.getStoredTires() != null ? model.getStoredTires().stream()
                     .map(AppointmentMapper::toStoredTireDto)
-                    .toList());
-        }
-        return dto;
+                    .toList() : null,
+            model.getStatus() != null ? model.getStatus().name() : null
+        );
     }
 
     private static StoredTire toStoredTire(StoredTireDto dto) {
         return new StoredTire(
-                dto.getBrand(), dto.getModel(), dto.getWidth(),
-                dto.getAspectRatio(), dto.getDiameter(),
-                dto.getSeason(), dto.getCondition()
+                dto.brand(), dto.model(), dto.width(),
+                dto.aspectRatio(), dto.diameter(),
+                dto.season(), dto.condition()
         );
     }
 
     private static StoredTireDto toStoredTireDto(StoredTire model) {
-        StoredTireDto dto = new StoredTireDto();
-        dto.setBrand(model.getBrand());
-        dto.setModel(model.getModel());
-        dto.setWidth(model.getWidth());
-        dto.setAspectRatio(model.getAspectRatio());
-        dto.setDiameter(model.getDiameter());
-        dto.setSeason(model.getSeason());
-        dto.setCondition(model.getCondition());
-        return dto;
+        return new StoredTireDto(
+                model.getBrand(),
+                model.getModel(),
+                model.getWidth(),
+                model.getAspectRatio(),
+                model.getDiameter(),
+                model.getSeason(),
+                model.getCondition()
+        );
     }
 }

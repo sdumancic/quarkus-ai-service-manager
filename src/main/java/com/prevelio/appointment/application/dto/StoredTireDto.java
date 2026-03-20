@@ -1,16 +1,11 @@
 package com.prevelio.appointment.application.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-public class StoredTireDto {
-    private String brand;
-    private String model;
-    private Integer width;
-    private Integer aspectRatio;
-    private Integer diameter;
-    private String season;
-    private String condition;
-}
+public record StoredTireDto(
+    String brand,
+    String model,
+    Integer width,
+    Integer aspectRatio,
+    Integer diameter,
+    String season,
+    String condition
+) {}

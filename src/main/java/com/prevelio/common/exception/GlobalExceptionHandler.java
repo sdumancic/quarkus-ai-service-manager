@@ -11,6 +11,7 @@ import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Provider
@@ -21,27 +22,14 @@ public class GlobalExceptionHandler implements ExceptionMapper<Throwable> {
     public Response toResponse(Throwable exception) {
         log.error("Unhandled exception: ", exception);
 
-        if (exception instanceof ConstraintViolationException cvException) {
-            return handleConstraintViolation(cvException);
-        }
-
-        if (exception instanceof NotFoundException nfException) {
-            return createResponse(nfException.getMessage(), Response.Status.NOT_FOUND);
-        }
-
-        if (exception instanceof BadRequestException brException) {
-            return createResponse(brException.getMessage(), Response.Status.BAD_REQUEST);
-        }
-
-        if (exception instanceof IllegalStateException isException) {
-            return createResponse(isException.getMessage(), Response.Status.BAD_REQUEST);
-        }
-
-        if (exception instanceof WebApplicationException waException) {
-            return createResponse(waException.getMessage(), Response.Status.fromStatusCode(waException.getResponse().getStatus()));
-        }
-
-        return createResponse("An unexpected error occurred: " + exception.getMessage(), Response.Status.INTERNAL_SERVER_ERROR);
+        return switch (exception) {
+            case ConstraintViolationException cv -> handleConstraintViolation(cv);
+            case NotFoundException nf -> createResponse(nf.getMessage(), Response.Status.NOT_FOUND);
+            case BadRequestException br -> createResponse(br.getMessage(), Response.Status.BAD_REQUEST);
+            case IllegalStateException is -> createResponse(is.getMessage(), Response.Status.BAD_REQUEST);
+            case WebApplicationException wa -> createResponse(wa.getMessage(), Response.Status.fromStatusCode(wa.getResponse().getStatus()));
+            default -> createResponse("An unexpected error occurred: " + exception.getMessage(), Response.Status.INTERNAL_SERVER_ERROR);
+        };
     }
 
     private Response handleConstraintViolation(ConstraintViolationException exception) {
@@ -49,8 +37,7 @@ public class GlobalExceptionHandler implements ExceptionMapper<Throwable> {
                 .map(ConstraintViolation::getMessage)
                 .toList();
 
-        ErrorResponseDto error = new ErrorResponseDto("Validation failed", Response.Status.BAD_REQUEST.getStatusCode());
-        error.setDetails(details);
+        ErrorResponseDto error = new ErrorResponseDto("Validation failed", Response.Status.BAD_REQUEST.getStatusCode(), LocalDateTime.now(), details);
         return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
     }
 

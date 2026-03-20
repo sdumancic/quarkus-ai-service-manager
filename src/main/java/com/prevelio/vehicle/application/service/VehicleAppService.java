@@ -38,7 +38,7 @@ public class VehicleAppService {
 
     public VehicleResponseDto createVehicle(VehicleRequestDto request) {
         // Validate customer exists and link IDs
-        var customer = customerService.getCustomerByUuid(request.getCustomerUuid());
+        var customer = customerService.getCustomerByUuid(request.customerUuid());
         
         Vehicle vehicle = VehicleMapper.toDomain(request);
         vehicle.setCustomerId(customer.getId());
@@ -52,17 +52,17 @@ public class VehicleAppService {
                 .orElseThrow(() -> new NotFoundException(VEHICLE_NOT_FOUND));
         
         // Ensure customer is valid
-        var customer = customerService.getCustomerByUuid(request.getCustomerUuid());
+        var customer = customerService.getCustomerByUuid(request.customerUuid());
         
-        existing.setCustomerUuid(request.getCustomerUuid());
+        existing.setCustomerUuid(request.customerUuid());
         existing.setCustomerId(customer.getId());
-        existing.setMake(request.getMake());
-        existing.setModel(request.getModel());
-        existing.setYear(request.getYear());
-        existing.setLicensePlate(request.getLicensePlate());
-        existing.setVin(request.getVin());
-        existing.setColor(request.getColor());
-        existing.setActive(request.isActive());
+        existing.setMake(request.make());
+        existing.setModel(request.model());
+        existing.setYear(request.year());
+        existing.setLicensePlate(request.licensePlate());
+        existing.setVin(request.vin());
+        existing.setColor(request.color());
+        existing.setActive(request.active());
         
         Vehicle updated = vehicleRepository.update(existing);
         return VehicleMapper.toDto(updated);

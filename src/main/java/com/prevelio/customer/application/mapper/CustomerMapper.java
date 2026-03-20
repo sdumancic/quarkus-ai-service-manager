@@ -18,38 +18,37 @@ public class CustomerMapper {
 
         Customer customer = new Customer();
         id.ifPresent(customer::setId);
-        customer.setName(customerRequestDto.getName());
-        customer.setEmail(customerRequestDto.getEmail());
-        customer.setPhone(customerRequestDto.getPhone());
-        customer.setAddress(customerRequestDto.getAddress());
-        customer.setCity(customerRequestDto.getCity());
-        customer.setState(customerRequestDto.getState());
-        customer.setZip(customerRequestDto.getZip());
-        customer.setCountry(customerRequestDto.getCountry());
+        customer.setName(customerRequestDto.name());
+        customer.setEmail(customerRequestDto.email());
+        customer.setPhone(customerRequestDto.phone());
+        customer.setAddress(customerRequestDto.address());
+        customer.setCity(customerRequestDto.city());
+        customer.setState(customerRequestDto.state());
+        customer.setZip(customerRequestDto.zip());
+        customer.setCountry(customerRequestDto.country());
         customer.setCustomerUuid(UUID.randomUUID());
         customer.setStatus(
-                customerRequestDto.getStatus() != null ? customerRequestDto.getStatus() : CustomerStatus.ACTIVE);
+                customerRequestDto.status() != null ? customerRequestDto.status() : CustomerStatus.ACTIVE);
         customer.setCreatedAt(LocalDateTime.now());
         customer.setUpdatedAt(LocalDateTime.now());
         return customer;
     }
 
     public static CustomerResponseDto toCustomerResponseDto(Customer customer) {
-        CustomerResponseDto customerResponseDto = new CustomerResponseDto();
-        customerResponseDto.setId(customer.getId());
-        customerResponseDto.setName(customer.getName());
-        customerResponseDto.setEmail(customer.getEmail());
-        customerResponseDto.setPhone(customer.getPhone());
-        customerResponseDto.setAddress(customer.getAddress());
-        customerResponseDto.setCity(customer.getCity());
-        customerResponseDto.setState(customer.getState());
-        customerResponseDto.setZip(customer.getZip());
-        customerResponseDto.setCountry(customer.getCountry());
-        customerResponseDto.setStatus(customer.getStatus());
-        customerResponseDto.setCreatedAt(customer.getCreatedAt());
-        customerResponseDto.setUpdatedAt(customer.getUpdatedAt());
-        customerResponseDto.setCustomerUuid(customer.getCustomerUuid());
-        return customerResponseDto;
+        return new CustomerResponseDto(
+            customer.getId(),
+            customer.getName(),
+            customer.getEmail(),
+            customer.getPhone(),
+            customer.getAddress(),
+            customer.getCity(),
+            customer.getState(),
+            customer.getZip(),
+            customer.getCountry(),
+            customer.getStatus(),
+            customer.getCreatedAt(),
+            customer.getUpdatedAt(),
+            customer.getCustomerUuid()
+        );
     }
 }
-

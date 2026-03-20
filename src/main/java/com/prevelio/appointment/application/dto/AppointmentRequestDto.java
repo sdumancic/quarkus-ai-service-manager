@@ -6,24 +6,26 @@ import java.util.UUID;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
-public class AppointmentRequestDto {
+public record AppointmentRequestDto(
     @NotNull(message = "Customer UUID is required")
-    private UUID customerUuid;
+    UUID customerUuid,
     
     @NotNull(message = "Vehicle UUID is required")
-    private UUID vehicleUuid;
+    UUID vehicleUuid,
     
     @NotNull(message = "Start date is required")
-    private LocalDateTime startDate;
+    LocalDateTime startDate,
     
-    private LocalDateTime endDate;
+    LocalDateTime endDate,
     
     @NotEmpty(message = "At least one service must be selected")
-    private List<Long> serviceIds;
-    private List<StoredTireDto> storedTires;
+    List<Long> serviceIds,
+    
+    List<StoredTireDto> storedTires
+) {
+    // Add a copy-with-new-endDate method if needed, or simply handle it elsewhere
+    public AppointmentRequestDto withEndDate(LocalDateTime endDate) {
+        return new AppointmentRequestDto(customerUuid, vehicleUuid, startDate, endDate, serviceIds, storedTires);
+    }
 }

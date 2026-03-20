@@ -48,11 +48,11 @@ public class CustomerResource {
     public PagedResponse<CustomerResponseDto> searchCustomers(@BeanParam CustomerSearchCriteria criteria) {
         PagedResponse<Customer> pagedCustomers = customerService.searchCustomers(criteria);
 
-        List<CustomerResponseDto> dtoList = pagedCustomers.getData().stream()
+        List<CustomerResponseDto> dtoList = pagedCustomers.data().stream()
                 .map(CustomerMapper::toCustomerResponseDto)
                 .toList();
 
-        return new PagedResponse<>(dtoList, pagedCustomers.getMetadata());
+        return new PagedResponse<>(dtoList, pagedCustomers.metadata());
     }
 
     @POST

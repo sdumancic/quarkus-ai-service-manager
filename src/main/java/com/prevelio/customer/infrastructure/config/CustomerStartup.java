@@ -47,20 +47,28 @@ public class CustomerStartup {
     }
 
     private void addSampleVehicles(Customer customer) {
-        VehicleRequestDto v1 = new VehicleRequestDto();
-        v1.setCustomerUuid(customer.getCustomerUuid());
-        v1.setMake("Toyota");
-        v1.setModel("Camry");
-        v1.setYear(2020);
-        v1.setLicensePlate("ABC-123" + customer.getId());
+        VehicleRequestDto v1 = new VehicleRequestDto(
+            customer.getCustomerUuid(),
+            "Toyota",
+            "Camry",
+            2020,
+            "ABC-123" + customer.getId(),
+            null, // vin
+            "White", // color
+            true // active
+        );
         vehicleAppService.createVehicle(v1);
 
-        VehicleRequestDto v2 = new VehicleRequestDto();
-        v2.setCustomerUuid(customer.getCustomerUuid());
-        v2.setMake("Honda");
-        v2.setModel("Civic");
-        v2.setYear(2022);
-        v2.setLicensePlate("XYZ-789" + customer.getId());
+        VehicleRequestDto v2 = new VehicleRequestDto(
+            customer.getCustomerUuid(),
+            "Honda",
+            "Civic", // model
+            2022, // year
+            "XYZ-789" + customer.getId(), // licensePlate
+            null, // vin
+            "BlackSpace", // color
+            true // active
+        );
         vehicleAppService.createVehicle(v2);
     }
 }

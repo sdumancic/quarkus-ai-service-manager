@@ -12,29 +12,29 @@ public class VehicleMapper {
 
     public static Vehicle toDomain(VehicleRequestDto dto) {
         Vehicle vehicle = new Vehicle();
-        vehicle.setCustomerUuid(dto.getCustomerUuid());
-        vehicle.setMake(dto.getMake());
-        vehicle.setModel(dto.getModel());
-        vehicle.setYear(dto.getYear());
-        vehicle.setLicensePlate(dto.getLicensePlate());
-        vehicle.setVin(dto.getVin());
-        vehicle.setColor(dto.getColor());
-        vehicle.setActive(dto.isActive());
+        vehicle.setCustomerUuid(dto.customerUuid());
+        vehicle.setMake(dto.make());
+        vehicle.setModel(dto.model());
+        vehicle.setYear(dto.year());
+        vehicle.setLicensePlate(dto.licensePlate());
+        vehicle.setVin(dto.vin());
+        vehicle.setColor(dto.color());
+        vehicle.setActive(dto.active());
         return vehicle;
     }
 
     public static VehicleResponseDto toDto(Vehicle vehicle) {
-        VehicleResponseDto dto = new VehicleResponseDto();
-        dto.setId(vehicle.getId());
-        dto.setVehicleUuid(vehicle.getVehicleUuid());
-        dto.setCustomerUuid(vehicle.getCustomerUuid());
-        dto.setMake(vehicle.getMake());
-        dto.setModel(vehicle.getModel());
-        dto.setYear(vehicle.getYear());
-        dto.setLicensePlate(vehicle.getLicensePlate());
-        dto.setVin(vehicle.getVin());
-        dto.setColor(vehicle.getColor());
-        dto.setActive(vehicle.isActive());
-        return dto;
+        return new VehicleResponseDto(
+            vehicle.getId(),
+            vehicle.getVehicleUuid(),
+            vehicle.getCustomerUuid(),
+            vehicle.getMake(),
+            vehicle.getModel(),
+            vehicle.getYear(),
+            vehicle.getLicensePlate(),
+            vehicle.getVin(),
+            vehicle.getColor(),
+            vehicle.isActive()
+        );
     }
 }

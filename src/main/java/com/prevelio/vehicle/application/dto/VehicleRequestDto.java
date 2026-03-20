@@ -4,27 +4,28 @@ import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
-public class VehicleRequestDto {
+public record VehicleRequestDto(
     @NotNull(message = "Customer UUID cannot be null")
-    private UUID customerUuid;
+    UUID customerUuid,
     
     @NotBlank(message = "Make cannot be blank")
-    private String make;
+    String make,
     
     @NotBlank(message = "Model cannot be blank")
-    private String model;
+    String model,
     
-    private Integer year;
+    Integer year,
     
     @NotBlank(message = "License plate cannot be blank")
-    private String licensePlate;
+    String licensePlate,
     
-    private String vin;
-    private String color;
-    private boolean active = true;
+    String vin,
+    String color,
+    boolean active
+) {
+    // Convenience constructor to match previous default value of active=true
+    public VehicleRequestDto(UUID customerUuid, String make, String model, Integer year, String licensePlate, String vin, String color) {
+        this(customerUuid, make, model, year, licensePlate, vin, color, true);
+    }
 }

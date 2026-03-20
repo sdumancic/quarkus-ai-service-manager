@@ -11,20 +11,20 @@ public class ServiceItemMapper {
 
     public static ServiceItem toDomain(ServiceItemRequestDto dto) {
         ServiceItem model = new ServiceItem();
-        model.setCode(dto.getCode());
-        model.setDescription(dto.getDescription());
-        model.setPrice(dto.getPrice());
-        model.setDurationInMinutes(dto.getDurationInMinutes());
+        model.setCode(dto.code());
+        model.setDescription(dto.description());
+        model.setPrice(dto.price());
+        model.setDurationInMinutes(dto.durationInMinutes());
         return model;
     }
 
     public static ServiceItemResponseDto toDto(ServiceItem model) {
-        ServiceItemResponseDto dto = new ServiceItemResponseDto();
-        dto.setId(model.getId());
-        dto.setCode(model.getCode());
-        dto.setDescription(model.getDescription());
-        dto.setPrice(model.getPrice());
-        dto.setDurationInMinutes(model.getDurationInMinutes());
-        return dto;
+        return new ServiceItemResponseDto(
+            model.getId(),
+            model.getCode(),
+            model.getDescription(),
+            model.getPrice(),
+            model.getDurationInMinutes()
+        );
     }
 }
